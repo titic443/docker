@@ -1,0 +1,47 @@
+version: "3"
+
+services:
+  
+  postgres:
+    container_name: test-postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: pgdb-ipms-dev
+      POSTGRES_USER: idmuser
+      POSTGRES_DB: pgdb-ipms-dev
+    ports:
+      - 5432:5432
+    volumes: 
+      - postgres:/var/lib/postgresql/data
+
+  # mongo:
+  #   container_name: dkrcomp-mongo
+  #   image: mongo
+  #   restart: always
+  #   logging:
+  #     options:
+  #         max-size: 1g
+  #   environment:
+  #     - MONGO_INITDB_ROOT_USERNAME=mongoadmin
+  #     - MONGO_INITDB_ROOT_PASSWORD=bdung
+  #   ports:
+  #     - '27017:27017'
+  #   volumes: 
+  #     - mongo:/var/lib/mongo/data
+      
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: test@test.com
+      PGADMIN_DEFAULT_PASSWORD: test
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+volumes:
+  postgres:
+  pgadmin-data:
+  mongo:
