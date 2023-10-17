@@ -1,0 +1,20 @@
+FROM node:12
+
+WORKDIR /app
+COPY package.json ./
+COPY ./dist ./
+COPY .env   ./
+
+RUN npm install
+ENV APP_PORT=9999
+ENV DB_USER=mind
+ENV DB_PASS=For+ever16!
+# Connect local data base not use localhost 
+ENV DB_HOST=host.docker.internal 
+ENV DB_PORT=3306
+ENV DB_NAME=express_web
+
+EXPOSE 9999:9999/tcp
+EXPOSE 3306:3306/tcp
+
+CMD ["node", "index.js"]
