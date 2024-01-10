@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: node-app
+  template:
+    metadata:
+      labels:
+        app: node-app
+    spec:
+      containers:
+      - name: node-app
+        image: titich/md-odoo-wams:1.0.1
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: node-app-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-app-service
+spec:
+  selector:
+    app: node-app
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-app-config
+data:
+  DB_HOST: '192.168.242.138'
+  DB_PORT: '5432'
+  DB_USERNAME: 'mw-adm'
+  DB_PASSWORD: "Mid#W@re23"
+  DB_DATABASE: 'mw-adm'
+
+  ODOO_URL: 'https://erp.energyabsolute.co.th'
+  ODOO_JSONRPC: '2.0'
+  ODOO_DB: prod
+  ODOO_LOGIN: api
+  ODOO_PASSWORD: 'Mid@W#re23'
+
+
+  FTP_HOST: '192.168.14.109'
+  FTP_USER: wams_ftp
+  FTP_PASSWORD: E@wa3s1!
+  FTP_PORT: '21'
+  FTP_DIRECTORY_CREATE: /Test - Sent files/Uipath/01-Create_WAMS/API_Odoo
+  FTP_DIRECTORY_SUBMIT: /Test - Sent files/Uipath/02-Submit_WAMS/API_Submit
+
+  WAMS_API_USERNAME: robot_create_wams
+  WAMS_API_PASSWORD: Robot@EA9
+  WAMS_API_URL: 'https://wams-api.energyabsolute.co.th'
+  WAMS_API_URL_AUTH: https://wams-api.energyabsolute.co.th/auth/login
+  WAMS_API_URL_REPORT: https://wams-api.energyabsolute.co.th//taskreports/all_transaction_waiting_approve/1
+
+
+  LINE_TOKEN: diVvypBHWxQOg9srRDe0K7E4YRL62iFy13aKodAc2n6
+  LINE_URL: 'https://notify-api.line.me/api/notify'
