@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: etax-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: etax-app
+  template:
+    metadata:
+      labels:
+        app: etax-app
+    spec:
+      containers:
+      - name: etax-app
+        image: titich/etax:3.0.0
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: etax-app-config
+        volumeMounts:
+        - name: my-claim-volume
+          mountPath: /tmp
+      volumes:
+      - name: my-claim-volume
+        persistentVolumeClaim:
+          claimName: my-claim
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: etax-app-service
+spec:
+  selector:
+    app: etax-app
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: etax-app-config
+data:
+  PORT: "3000"
+  DATABASE_HOST: "192.168.14.232"
+  DATABASE_PORT: "1433"
+  DATABASE_USER: 'DevAXR'
+  DATABASE_PASSWORD: "sqlvctest@dev"
+  DATABASE_NAME: 'EAVCAX62TEST'
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: local-storage
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /tmp
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - minikube
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-claim
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: local-storage
+  resources:
+    requests:
+      storage: 2Gi
