@@ -13,6 +13,9 @@ WORKDIR /dist
 
 RUN ls -l
 
+RUN apk --no-cache add samba-client busybox busybox-extras
+RUN ln -s /bin/busybox /bin/telnet
+
 RUN npm install --omit=dev
  
 
